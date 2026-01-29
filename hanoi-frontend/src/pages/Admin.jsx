@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API= import.meta.env.VITE_API_URL ;
 
 export default function Admin() {
     const [disks, setDisks] = useState(3);

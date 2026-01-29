@@ -46,7 +46,7 @@ const { Server } = require("socket.io");
 const io = new Server(server, {
     cors: {
         // Change this back to localhost for testing
-        origin: "http://localhost:5173", 
+        origin: "https://hanoi-arena.vercel.app", 
         methods: ["GET", "POST"]
     }
 });

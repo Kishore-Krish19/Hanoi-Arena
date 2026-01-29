@@ -7,7 +7,7 @@ import { useWindowSize } from "react-use";
 const moveSound = new Audio("/sounds/move.mp3");
 const winSound = new Audio("/sounds/win.mp3");
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API= import.meta.env.VITE_API_URL;
 
 /* ---------- Tower Component ---------- */
 function Tower({ disks, onClick, selected, isGoal }) {
