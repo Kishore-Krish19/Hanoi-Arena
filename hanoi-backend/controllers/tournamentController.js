@@ -32,9 +32,11 @@ exports.startTournament = async (req, res) => {
     if (!name || !start_time) return res.status(400).json({ message: "Name and start time required" });
 
     try {
+        const utcStartTime = new Date(start_time).toISOString(); 
+
         const [result] = await db.query(
             `INSERT INTO tournaments (name, status, start_time, current_round) VALUES (?, 'pending', ?, 1)`,
-            [name, new Date(start_time).toISOString()]
+            [name, utcStartTime]
         );
         res.json({ message: "Tournament scheduled", id: result.insertId });
     } catch (err) {

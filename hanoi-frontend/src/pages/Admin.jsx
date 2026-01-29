@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 
-const API= import.meta.env.VITE_API_URL ;
+const API = import.meta.env.VITE_API_URL;
 
 export default function Admin() {
     const [disks, setDisks] = useState(3);
@@ -10,15 +10,15 @@ export default function Admin() {
     const [startTime, setStartTime] = useState("");
     const [tournament, setTournament] = useState(null);
     const [tName, setTName] = useState("");
-    
+
     const token = localStorage.getItem("token");
     const nav = useNavigate();
-    
+
     useEffect(() => {
-        fetch(`${API}/api/config`) 
+        fetch(`${API}/api/config`)
             .then(res => res.json())
             .then(data => setDisks(data.disks))
-            .catch(err => console.error("Login Error:", err)); 
+            .catch(err => console.error("Login Error:", err));
     }, []);
     // Load config
     useEffect(() => {
@@ -60,13 +60,18 @@ export default function Admin() {
         const data = await res.json();
         setTournament(data);
     }
+    const body = {
+        name: tournamentName,
+        start_time: new Date(startTimeInput).toISOString()
+    };
     // Start Tournament
     async function startTournament() {
-
         if (!tName || !startTime) {
             alert("Enter name and start time");
             return;
         }
+
+        const utcStartTime = new Date(startTime).toISOString();
 
         const res = await fetch(API + "/api/tournament/start", {
             method: "POST",
@@ -76,15 +81,13 @@ export default function Admin() {
             },
             body: JSON.stringify({
                 name: tName,
-                start_time: startTime
+                start_time: utcStartTime
             })
         });
 
         const data = await res.json();
-
         alert(data.message || "Tournament scheduled");
-
-        loadTournament(); // refresh UI
+        loadTournament();
     }
     // End Tournament
     async function endTournament() {
