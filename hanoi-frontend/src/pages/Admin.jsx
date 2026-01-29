@@ -60,10 +60,6 @@ export default function Admin() {
         const data = await res.json();
         setTournament(data);
     }
-    const body = {
-        name: tournamentName,
-        start_time: new Date(startTimeInput).toISOString()
-    };
     // Start Tournament
     async function startTournament() {
         if (!tName || !startTime) {
