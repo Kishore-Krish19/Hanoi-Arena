@@ -9,16 +9,16 @@ exports.getTournament = async (req, res) => {
         if (!result[0]) return res.json(null);
 
         const tour = result[0];
-        const now = new Date();
-        const scheduledStart = new Date(tour.start_time);
+        const nowUTC = new Date().toISOString();
+        const scheduledStart = new Date(tour.start_time).getTime();
 
-        if (tour.status === 'pending' && now >= scheduledStart) {
+        if (tour.status === 'pending' && Date.now() >= scheduledStart) {
             await db.query(
                 `UPDATE tournaments SET status = 'active', start_time = ? WHERE id = ?`,
-                [now, tour.id]
+                [nowUTC, tour.id] // Force UTC to TiDB
             );
             tour.status = 'active';
-            tour.start_time = now;
+            tour.start_time = nowUTC;
         }
         res.json(tour);
     } catch (err) {
@@ -34,7 +34,7 @@ exports.startTournament = async (req, res) => {
     try {
         const [result] = await db.query(
             `INSERT INTO tournaments (name, status, start_time, current_round) VALUES (?, 'pending', ?, 1)`,
-            [name, new Date(start_time)]
+            [name, new Date(start_time).toISOString()]
         );
         res.json({ message: "Tournament scheduled", id: result.insertId });
     } catch (err) {
@@ -55,10 +55,10 @@ exports.endTournament = async (req, res) => {
 // Next Round
 exports.nextRound = async (req, res) => {
     try {
-        const now = new Date();
+        const nowUTC = new Date().toISOString();
         await db.query(
             "UPDATE tournaments SET current_round = current_round + 1, start_time = ? WHERE status='active'",
-            [now]
+            [nowUTC]
         );
         res.json({ message: "Next round started with fresh timer" });
     } catch (err) {
@@ -88,7 +88,7 @@ exports.qualifyPlayers = async (req, res) => {
 
         await db.query("DELETE FROM tournament_qualifiers WHERE tournament_id=? AND round=?", [tour.id, round]);
         const values = qualified.map((q) => [tour.id, round, q.user_id]);
-        
+
         // Use standard query for bulk insert
         await db.query("INSERT INTO tournament_qualifiers (tournament_id, round, user_id) VALUES ?", [values]);
 
@@ -152,4 +152,9 @@ exports.checkEligibility = async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
+};
+
+// Get Server Time
+exports.getServerTime = (req, res) => {
+    res.json({ serverTime: new Date().toISOString() });
 };

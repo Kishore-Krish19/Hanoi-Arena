@@ -7,7 +7,7 @@ import { useWindowSize } from "react-use";
 const moveSound = new Audio("/sounds/move.mp3");
 const winSound = new Audio("/sounds/win.mp3");
 
-const API= import.meta.env.VITE_API_URL;
+const API = import.meta.env.VITE_API_URL;
 
 /* ---------- Tower Component ---------- */
 function Tower({ disks, onClick, selected, isGoal }) {
@@ -72,7 +72,22 @@ export default function Game() {
     const [tournament, setTournament] = useState(null);
     const [hasPlayedThisRound, setHasPlayedThisRound] = useState(false);
     const token = localStorage.getItem("token");
+    const [serverOffset, setServerOffset] = useState(0);
 
+    useEffect(() => {
+        async function syncTime() {
+            const start = Date.now();
+            const res = await fetch(API + "/api/tournament/time");
+            const { serverTime } = await res.json();
+            const end = Date.now();
+
+            // Account for network latency
+            const latency = (end - start) / 2;
+            const serverDate = new Date(serverTime).getTime();
+            setServerOffset(serverDate - (end - latency));
+        }
+        syncTime();
+    }, []);
     /* ---------- Init Towers ---------- */
     const generateTowers = (n) => [
         Array.from({ length: n }, (_, i) => n - i),
@@ -112,48 +127,41 @@ export default function Game() {
         loadTournament();
     }, []);
 
+    // ✅ KEEP AND UPDATE THIS BLOCK
     useEffect(() => {
-        if (!tournament || tournament.status === "ended") {
-            setCanPlay(false);
-            return;
-        }
+        if (!tournament || tournament.status === "ended") return;
 
-        if (tournament.status === "pending") {
-            const timer = setInterval(() => {
-                const now = new Date();
-                const start = new Date(tournament.start_time);
-                const diff = Math.floor((start - now) / 1000);
+        const timer = setInterval(() => {
+            const syncedNow = Date.now() + serverOffset;
+            const start = new Date(tournament.start_time).getTime();
 
+            if (tournament.status === "pending") {
+                const diff = Math.floor((start - syncedNow) / 1000);
                 if (diff > 0) {
                     setCountdown(diff);
                     setCanPlay(false);
                 } else {
                     setCountdown(0);
                     setCanPlay(true);
-                    setTimeLeft(300);
                     clearInterval(timer);
                 }
-            }, 1000);
-            return () => clearInterval(timer);
-        }
-
-        if (tournament.status === "active") {
-            const totalDuration = 300;
-            const now = new Date().getTime();
-            const start = new Date(tournament.start_time).getTime();
-            const secondsElapsed = Math.floor((now - start) / 1000);
-            const remaining = totalDuration - secondsElapsed;
-
-            if (remaining > 0) {
-                setTimeLeft(remaining);
-                setCanPlay(true);
-            } else {
-                setTimeLeft(0);
-                setCanPlay(false);
-                setHasPlayedThisRound(true);
+            } else if (tournament.status === "active") {
+                // Logic for the 5-minute (300s) round duration
+                const secondsElapsed = Math.floor((syncedNow - start) / 1000);
+                const remaining = 300 - secondsElapsed;
+                if (remaining > 0) {
+                    setTimeLeft(remaining);
+                    setCanPlay(true);
+                } else {
+                    setTimeLeft(0);
+                    setCanPlay(false);
+                    setHasPlayedThisRound(true);
+                    clearInterval(timer);
+                }
             }
-        }
-    }, [tournament]);
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [tournament, serverOffset]);
 
     useEffect(() => {
         if (hasWon || !canPlay || timeLeft <= 0) return;
