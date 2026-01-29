@@ -14,7 +14,8 @@ const {
     qualifyPlayers,
     getBracket,
     checkEligibility,
-    getServerTime
+    getServerTime,
+    getMyStatus
 } = require("../controllers/tournamentController");
 
 router.post("/start", auth, admin, startTournament);
@@ -26,7 +27,7 @@ router.post("/result", auth, saveResult);
 router.post("/next", auth, admin, nextRound);
 router.get("/qualify", auth, admin, qualifyPlayers);
 
-// This will now work because the function is imported above
+router.get("/my-status", auth, getMyStatus);
 router.get("/check-eligibility", auth, checkEligibility);
 router.get("/time", getServerTime);
 router.get("/bracket", getBracket);

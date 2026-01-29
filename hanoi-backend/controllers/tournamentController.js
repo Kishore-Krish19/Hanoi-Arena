@@ -158,3 +158,23 @@ exports.checkEligibility = async (req, res) => {
 exports.getServerTime = (req, res) => {
     res.json({ serverTime: new Date().toISOString() });
 };
+
+// Get My Status
+exports.getMyStatus = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const [t] = await db.query("SELECT id, current_round FROM tournaments WHERE status='active' LIMIT 1");
+
+        if (!t.length) return res.json({ hasSubmitted: false });
+
+        const tour = t[0];
+        const [results] = await db.query(
+            "SELECT id FROM tournament_results WHERE tournament_id=? AND round=? AND user_id=?",
+            [tour.id, tour.current_round, userId]
+        );
+
+        res.json({ hasSubmitted: results.length > 0 });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
