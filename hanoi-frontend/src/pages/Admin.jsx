@@ -3,12 +3,6 @@ import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 
 const API= import.meta.env.VITE_API_URL ;
-useEffect(() => {
-    fetch(`${API}/api/config`) 
-        .then(res => res.json())
-        .then(data => setDisks(data.disks))
-        .catch(err => console.error("Login Error:", err)); 
-}, []);
 
 export default function Admin() {
     const [disks, setDisks] = useState(3);
@@ -16,10 +10,16 @@ export default function Admin() {
     const [startTime, setStartTime] = useState("");
     const [tournament, setTournament] = useState(null);
     const [tName, setTName] = useState("");
-
+    
     const token = localStorage.getItem("token");
     const nav = useNavigate();
-
+    
+    useEffect(() => {
+        fetch(`${API}/api/config`) 
+            .then(res => res.json())
+            .then(data => setDisks(data.disks))
+            .catch(err => console.error("Login Error:", err)); 
+    }, []);
     // Load config
     useEffect(() => {
         fetch(API + "/api/config")
