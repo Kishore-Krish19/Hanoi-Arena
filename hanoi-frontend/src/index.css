@@ -12,6 +12,21 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+/* ===== GLOBAL FIX ===== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
 
 a {
   font-weight: 500;
@@ -72,7 +87,8 @@ button:focus-visible {
 
 input {
   padding: 10px;
-  width: 250px;
+  width: 100%;
+  max-width: 100%;
   border-radius: 6px;
   border: none;
   margin: 5px;
@@ -107,22 +123,30 @@ button:hover {
 }
 
 /* ===== MAIN CONTENT AREA (below navbar) ===== */
-.main {
+/* .main {
   min-height: calc(100vh - 70px);
-  /* 70px = approximate navbar height */
 
   display: flex;
   justify-content: center;
-  /* Horizontal center */
   align-items: center;
-  /* Vertical center */
+
+  width: 100%;
+  padding: 20px;
+} */
+
+.main {
+  min-height: calc(100vh - 70px);
+
+  display: flex;
+  justify-content: center;
+  /* align-items: flex-start;   */
 
   width: 100%;
   padding: 20px;
 }
 
 /* ===== GLASS CARD UI ===== */
-.center-card {
+/* .center-card {
   background: rgba(2, 6, 23, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 18px;
@@ -130,6 +154,22 @@ button:hover {
 
   width: 100%;
   max-width: 420px;
+
+  box-shadow:
+    0 0 30px rgba(56, 189, 248, 0.15),
+    inset 0 0 10px rgba(255, 255, 255, 0.05);
+
+  text-align: center;
+} */
+.center-card {
+  background: rgba(2, 6, 23, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+
+  width: 100%;
+  max-width: 420px;
+  margin: auto;
+  padding: 24px;  
 
   box-shadow:
     0 0 30px rgba(56, 189, 248, 0.15),
@@ -244,22 +284,6 @@ button:hover {
   outline: 3px solid #facc15;
 }
 
-/* ===== NAVBAR ===== */
-/* 
-.navbar {
-  background: linear-gradient(180deg, #020617, #000);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 2px 15px rgba(56,189,248,0.15);
-
-  padding: 14px 25px;
-
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  border-bottom: 1px solid #1e293b;
-} */
-
 .logo {
   color: #38bdf8;
   font-weight: bold;
@@ -350,10 +374,10 @@ button:active {
 /* ===== ADMIN PAGE STYLING ===== */
 /* Container for the Admin content to keep it centered but left-aligned internally */
 .admin-container {
-  max-width: 900px;
+  max-width: 100%;
+  width: 100%;
   margin: 0 auto;
   text-align: left;
-  /* Headers stay left, buttons align via flex */
 }
 
 /* Flex row for buttons and inputs */
@@ -466,4 +490,87 @@ ul {
   list-style-type: none;
   padding: 0;
   margin: 0;
+}
+
+/* ===== MOBILE FIX ===== */
+
+html, body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+
+  body {
+    font-size: 14px;
+  }
+
+  .main {
+    align-items: flex-start;
+    padding: 12px;
+  }
+
+  .center-card {
+    width: 100%;
+    max-width: 100%;
+    margin: 120px auto;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  input,
+  button {
+    width: 100%;
+  }
+
+  /* Navbar */
+  .navbar {
+    flex-direction: column;
+    height: auto;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .nav-links a,
+  .nav-links button {
+    width: 100%;
+  }
+
+  /* Admin */
+  .admin-container {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .admin-row {
+    flex-direction: column;
+  }
+
+  /* Game */
+  .game {
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .tower {
+    width: 90px;
+    height: 240px;
+  }
+
+  /* Tables */
+  table,
+  .bracket-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
 }
