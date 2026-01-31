@@ -3,7 +3,6 @@
 A full-stack Tower of Hanoi multiplayer web application optimized for high concurrency, real-time gameplay, and competitive tournaments.
 
 🌐 Live Demo: https://hanoi-arena.vercel.app/  
-📦 Repository: https://github.com/Kishore-Krish19/Hanoi-Arena
 
 ---
 
@@ -50,9 +49,11 @@ It features user authentication, admin controls, tournament brackets, and live s
 
 ### 🛠 Admin Panel
 - Manage game settings
-- Control tournaments
-- Monitor players
 - Update disk limits
+- Monitor players
+- Control tournaments
+- Qualify players for next round
+- Add rounds
 
 ### ⚡ Performance & Scalability
 - Backend optimized for concurrent users
