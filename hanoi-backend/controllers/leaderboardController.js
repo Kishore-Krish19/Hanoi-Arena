@@ -12,7 +12,7 @@ exports.getLeaderboard = async (req, res) => {
     FROM users u
     JOIN games g ON u.id = g.user_id
     WHERE g.score IS NOT NULL
-    GROUP BY u.id
+    GROUP BY u.id, u.username
     ORDER BY best_score DESC, best_time ASC
     LIMIT ?
   `;
@@ -32,10 +32,11 @@ exports.getMyRank = async (req, res) => {
     SELECT rank FROM (
       SELECT 
         u.id,
+        u.username,
         RANK() OVER (ORDER BY MAX(g.score) DESC) AS rank
       FROM users u
       JOIN games g ON u.id = g.user_id
-      GROUP BY u.id
+      GROUP BY u.id, u.username
     ) ranks
     WHERE id = ?
   `;
