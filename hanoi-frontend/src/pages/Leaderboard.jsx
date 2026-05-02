@@ -3,9 +3,10 @@ import { io } from "socket.io-client";
 import Layout from "../components/Layout";
 import { motion } from "framer-motion";
 
-const API = import.meta.env.VITE_API_URL;
-
-const socket = io(API);
+// Change 'API' to be just the URL string
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+// Use that string to create the socket connection
+const socket = io(API_URL);
 
 export default function Leaderboard() {
     const [data, setData] = useState([]);
@@ -14,11 +15,18 @@ export default function Leaderboard() {
     async function load() {
         setLoading(true);
 
-        const res = await fetch(API + "/api/leaderboard");
-        const json = await res.json();
-
-        setData(json);
-        setLoading(false);
+        try {
+            // 3. Use the string for fetch
+            const res = await fetch(`${API_URL}/api/leaderboard`);
+            // Safety check: ensure the response is actually JSON
+            if (!res.ok) throw new Error("Network response was not ok");
+            const json = await res.json();
+            setData(json);
+        } catch (error) {
+            console.error("Failed to load leaderboard:", error);
+        } finally {
+            setLoading(false);
+        }
     }
 
 
@@ -36,11 +44,11 @@ export default function Leaderboard() {
 
     return (
         <Layout>
-            <div className="bracket-page-container"> 
+            <div className="bracket-page-container">
                 <div className="app">
                     <h2>Live Leaderboard</h2>
 
-                    <table className="bracket-table"> 
+                    <table className="bracket-table">
                         <thead>
                             <tr>
                                 <th>Rank</th>
